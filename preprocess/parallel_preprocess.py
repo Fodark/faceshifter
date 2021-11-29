@@ -140,7 +140,7 @@ def process_image(image):
 
 
 
-with Pool(processes=cpu_count()) as pool:
+with Pool(processes=10) as pool:
     pool.map(process_image, files)        
     print("done")
     pool.close()

@@ -1,2 +1,2 @@
 #!/bin/bash
-python preprocess.py --root /DATA --output_dir /RESULT
+python preprocess/parallel_preprocess.py --root /DATA --output_dir /RESULT
