@@ -8,7 +8,7 @@ arcface:
   vector_size: 256
 
 data:
-  dataset_dir: ''
+  dataset_dir: '/DATA'
   valset_dir: ''
 
 model:
