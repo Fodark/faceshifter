@@ -43,6 +43,7 @@ files = tqdm(img_files)
 
 
 def process_image(image):
+    global cnt
     output_img = os.path.join(args.output_dir, f"{cnt:08}.png")
     if os.path.isfile(output_img):
         cnt += 1
