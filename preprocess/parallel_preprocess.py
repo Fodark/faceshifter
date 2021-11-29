@@ -24,7 +24,7 @@ output_size = 256
 transform_size=4096
 enable_padding=True
 detector = dlib.get_frontal_face_detector()
-sp = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+sp = dlib.shape_predictor('preprocess/shape_predictor_68_face_landmarks.dat')
 
 torch.backends.cudnn.benchmark = False
 
