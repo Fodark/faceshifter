@@ -36,6 +36,10 @@ img_files = [
             if filename.endswith(".png") or filename.endswith(".jpg") or filename.endswith(".jpeg")
         ]
 img_files.sort()
+
+print(len(img_files), "images to analyse")
+exit(1)
+
 cnt = 0
 files = tqdm(img_files)
 
