@@ -37,10 +37,10 @@ img_files = [
         ]
 img_files.sort()
 
-print(len(img_files), "images to analyse")
-exit(1)
 
 cnt = 0
+miss = 0
+ttl = 0
 files = tqdm(img_files)
 
 
@@ -48,15 +48,20 @@ files = tqdm(img_files)
 
 def process_image(image):
     global cnt
+    global miss
+    global ttl
     output_img = os.path.join(args.output_dir, f"{cnt:08}.png")
     if os.path.isfile(output_img):
         cnt += 1
+        ttl += 1
         return
     else:
         img = dlib.load_rgb_image(image)
         dets = detector(img, 1)
         if len(dets) <= 0:
-            print("no face landmark detected")
+            miss += 1
+            ttl += 1
+            print(f"miss {miss}/{ttl}")
         else:
             shape = sp(img, dets[0])
             points = np.empty([68, 2], dtype=int)
