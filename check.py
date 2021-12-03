@@ -11,6 +11,8 @@ for filename in os.listdir(train_path):
         img.verify()
     except Exception:
         print('Corrupted image in train: ' + filename)
+        os.remove(os.path.join(train_path, filename))
+        print('Removed')
 
 # also for val
 for filename in os.listdir(val_path):
@@ -19,3 +21,5 @@ for filename in os.listdir(val_path):
         img.verify()
     except Exception:
         print('Corrupted image in val: ' + filename)
+        os.remove(os.path.join(val_path, filename))
+        print('Removed')
