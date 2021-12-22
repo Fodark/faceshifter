@@ -11,23 +11,25 @@ from torch.utils.data import Dataset
 
 import warnings
 
+
 class AEI_Dataset(Dataset):
-    def __init__(self, root, transform=None):
+    def __init__(self, root, lowres, transform=None):
         super(AEI_Dataset, self).__init__()
         self.root = root
         self.files = [
             os.path.join(path, filename)
             for path, dirs, files in os.walk(root)
             for filename in files
-            if filename.endswith(".png") or filename.endswith(".jpg") or filename.endswith(".jpeg")
+            if filename.endswith(".png")
+            or filename.endswith(".jpg")
+            or filename.endswith(".jpeg")
         ]
-        self.transform = transform
-
+        self.transform_source, self.transform_target = transform
 
     def __getitem__(self, index):
         l = len(self.files)
-        s_idx = index%l
-        if index >= 4*l:
+        s_idx = index % l
+        if index >= 4 * l:
             f_idx = s_idx
 
         else:
@@ -46,12 +48,12 @@ class AEI_Dataset(Dataset):
         f_img = Image.open(self.files[f_idx])
         s_img = Image.open(self.files[s_idx])
 
-        f_img = f_img.convert('RGB')
-        s_img = s_img.convert('RGB')
+        f_img = f_img.convert("RGB")
+        s_img = s_img.convert("RGB")
 
         if self.transform is not None:
-            f_img = self.transform(f_img)
-            s_img = self.transform(s_img)
+            f_img = self.transform_target(f_img)
+            s_img = self.transform_source(s_img)
 
         return f_img, s_img, same
 
@@ -67,7 +69,9 @@ class AEI_Val_Dataset(Dataset):
             os.path.join(path, filename)
             for path, dirs, files in os.walk(root)
             for filename in files
-            if filename.endswith(".png") or filename.endswith(".jpg") or filename.endswith(".jpeg")
+            if filename.endswith(".png")
+            or filename.endswith(".jpg")
+            or filename.endswith(".jpeg")
         ]
         self.transfrom = transform
 
@@ -85,8 +89,8 @@ class AEI_Val_Dataset(Dataset):
         f_img = Image.open(self.files[f_idx])
         s_img = Image.open(self.files[s_idx])
 
-        f_img = f_img.convert('RGB')
-        s_img = s_img.convert('RGB')
+        f_img = f_img.convert("RGB")
+        s_img = s_img.convert("RGB")
 
         if self.transfrom is not None:
             f_img = self.transfrom(f_img)

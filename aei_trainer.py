@@ -8,6 +8,10 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 
 from aei_net import AEINet
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 def main(args):
     hp = OmegaConf.load(args.config)
@@ -17,18 +21,21 @@ def main(args):
 
     checkpoint_callback = ModelCheckpoint(
         filepath=os.path.join(hp.log.chkpt_dir, args.name),
-        monitor='val_loss',
+        monitor="val_loss",
         verbose=True,
         save_top_k=args.save_top_k,  # save all
     )
 
+    logger = pl_loggers.WandbLogger(project="FaceShifter")
+
     trainer = Trainer(
-        logger=pl_loggers.TensorBoardLogger(hp.log.log_dir),
+        # logger=pl_loggers.TensorBoardLogger(hp.log.log_dir),
+        logger=logger,
         early_stop_callback=None,
         checkpoint_callback=checkpoint_callback,
         weights_save_path=save_path,
         gpus=-1 if args.gpus is None else args.gpus,
-        distributed_backend='ddp',
+        distributed_backend="ddp",
         num_sanity_val_steps=1,
         resume_from_checkpoint=args.checkpoint_path,
         gradient_clip_val=hp.model.grad_clip,
@@ -40,22 +47,52 @@ def main(args):
     trainer.fit(model)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument('-c', '--config', type=str, required=True,
-                        help="path of configuration yaml file")
-    parser.add_argument('-g', '--gpus', type=str, default=None,
-                        help="Number of gpus to use (e.g. '0,1,2,3'). Will use all if not given.")
-    parser.add_argument('-n', '--name', type=str, required=True,
-                        help="Name of the run.")
-    parser.add_argument('-p', '--checkpoint_path', type=str, default=None,
-                        help="path of checkpoint for resuming")
-    parser.add_argument('-s', '--save_top_k', type=int, default=-1,
-                        help="save top k checkpoints, default(-1): save all")
-    parser.add_argument('-f', '--fast_dev_run', type=bool, default=False,
-                        help="fast run for debugging purpose")
-    parser.add_argument('--val_interval', type=float, default=0.01,
-                        help="run val loop every * training epochs")
+    parser.add_argument(
+        "-c",
+        "--config",
+        type=str,
+        required=True,
+        help="path of configuration yaml file",
+    )
+    parser.add_argument(
+        "-g",
+        "--gpus",
+        type=str,
+        default=None,
+        help="Number of gpus to use (e.g. '0,1,2,3'). Will use all if not given.",
+    )
+    parser.add_argument(
+        "-n", "--name", type=str, required=True, help="Name of the run."
+    )
+    parser.add_argument(
+        "-p",
+        "--checkpoint_path",
+        type=str,
+        default=None,
+        help="path of checkpoint for resuming",
+    )
+    parser.add_argument(
+        "-s",
+        "--save_top_k",
+        type=int,
+        default=-1,
+        help="save top k checkpoints, default(-1): save all",
+    )
+    parser.add_argument(
+        "-f",
+        "--fast_dev_run",
+        type=bool,
+        default=False,
+        help="fast run for debugging purpose",
+    )
+    parser.add_argument(
+        "--val_interval",
+        type=float,
+        default=0.01,
+        help="run val loop every * training epochs",
+    )
 
     args = parser.parse_args()
 

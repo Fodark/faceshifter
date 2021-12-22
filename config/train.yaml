@@ -10,6 +10,7 @@ arcface:
 data:
   dataset_dir: '/DATA/train'
   valset_dir: '/DATA/val'
+  lowres: true
 
 model:
   learning_rate_E_G: 4e-4
