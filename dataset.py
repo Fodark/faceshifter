@@ -51,7 +51,7 @@ class AEI_Dataset(Dataset):
         f_img = f_img.convert("RGB")
         s_img = s_img.convert("RGB")
 
-        if self.transform is not None:
+        if True:
             f_img = self.transform_target(f_img)
             s_img = self.transform_source(s_img)
 

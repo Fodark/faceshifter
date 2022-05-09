@@ -74,11 +74,19 @@ class AEINet(pl.LightningModule):
 
             loss_G = loss_E_G + loss_GAN
 
-            self.log("Loss G", loss_G.item(), self.global_step)
-            self.log("Attribute Loss", loss_att.item(), self.global_step)
-            self.log("ID Loss", loss_id.item(), self.global_step)
-            self.log("Reconstruction Loss", loss_rec.item(), self.global_step)
-            self.log("GAN Loss", loss_GAN.item(), self.global_step)
+            #self.log("G/loss", loss_G.item(), self.global_step)
+            #self.log("G/attribute", loss_att.item(), self.global_step)
+            #self.log("G/id", loss_id.item(), self.global_step)
+            #self.log("G/recon", loss_rec.item(), self.global_step)
+            #self.log("G/gan", loss_GAN.item(), self.global_step)
+            if self.global_step % 50 == 0:
+                wandb.log({
+                    "G/loss": loss_G.item(),
+                    "G/id": loss_id.item(),
+                    "G/att": loss_att.item(),
+                    "G/recon": loss_rec.item(),
+                    "G/gan": loss_GAN.item()
+                }, self.global_step)
 
             return loss_G
 
@@ -90,8 +98,8 @@ class AEINet(pl.LightningModule):
             loss_D_real = self.Loss_GAN(output_multi_scale_val, False)
 
             loss_D = loss_D_fake + loss_D_real
-
-            self.log("Loss D", loss_D.item(), self.global_step)
+            if self.global_step % 50 == 0:
+                wandb.log({"D/loss": loss_D.item()}, self.global_step)
             return loss_D
 
     def validation_step(self, batch, batch_idx):
@@ -127,12 +135,10 @@ class AEINet(pl.LightningModule):
             ]
         validation_image = torchvision.utils.make_grid(validation_image, nrow=3)
 
-        self.log("Validation Loss", loss.item(), self.global_step)
-        self.trainer.logger.log_image(
-            key="Validation Image",
-            images=[wandb.Image(validation_image)],
-            step=self.global_step,
-        )
+        wandb.log({"V/loss": loss.item()}, self.global_step)
+        wandb.log({
+            "V/image": [wandb.Image(validation_image)]
+        }, self.global_step)
 
         return {
             "loss": loss,
@@ -179,7 +185,7 @@ class AEINet(pl.LightningModule):
                 ]
             )
         dataset = AEI_Dataset(
-            self.hp.data.dataset_dir, transform=[transform_source, transform_target]
+            self.hp.data.dataset_dir, transform=[transform_source, transform_target], lowres=False
         )
         return DataLoader(
             dataset,

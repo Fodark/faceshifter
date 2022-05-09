@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from pytorch_lightning import Trainer
 from pytorch_lightning import loggers as pl_loggers
 from pytorch_lightning.callbacks import ModelCheckpoint
+import wandb
 
 from aei_net import AEINet
 
@@ -20,27 +21,26 @@ def main(args):
     os.makedirs(save_path, exist_ok=True)
 
     checkpoint_callback = ModelCheckpoint(
-        filepath=os.path.join(hp.log.chkpt_dir, args.name),
+        dirpath=os.path.join(hp.log.chkpt_dir, args.name),
         monitor="val_loss",
         verbose=True,
         save_top_k=args.save_top_k,  # save all
     )
-
-    logger = pl_loggers.WandbLogger(project="FaceShifter")
+    wandb.init(project="faceshifter", name=args.name)
+    #logger = pl_loggers.WandbLogger(project="FaceShifter")
 
     trainer = Trainer(
         # logger=pl_loggers.TensorBoardLogger(hp.log.log_dir),
-        logger=logger,
-        early_stop_callback=None,
+        # logger=logger,
         checkpoint_callback=checkpoint_callback,
         weights_save_path=save_path,
         gpus=-1 if args.gpus is None else args.gpus,
-        distributed_backend="ddp",
+        strategy="ddp",
         num_sanity_val_steps=1,
         resume_from_checkpoint=args.checkpoint_path,
         gradient_clip_val=hp.model.grad_clip,
         fast_dev_run=args.fast_dev_run,
-        val_check_interval=args.val_interval,
+        val_check_interval=.25,
         progress_bar_refresh_rate=1,
         max_epochs=10000,
     )

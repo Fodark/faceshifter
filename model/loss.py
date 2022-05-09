@@ -97,7 +97,9 @@ class AEI_Loss(nn.Module):
 
     def att_loss(self, z_att_X, z_att_Y):
         loss = 0
-        for i in range(8):
+        low_level_features = range(0, 4)
+        high_level_features = range(4, 8)
+        for i in high_level_features:
             loss += self.l2(z_att_X[i], z_att_Y[i])
         return 0.5*loss
 
